@@ -14,6 +14,17 @@ Author URI: http://www.odesk.com/users/~~94ca72c849152a57
 
 $mainmenu = 0;
 
+function getDomain($url) {
+    if(filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED) === FALSE)
+    {
+        return false;
+    }
+    /*** get the url parts ***/
+    $parts = parse_url($url);
+    /*** return the host domain ***/
+    return $parts['host'];
+}
+
 function vsm_get_menus(&$json_data, $menu_items, $parent) {
 	global $mainmenu;
 	$k = 0;
@@ -68,7 +79,17 @@ function vsm_nav_menus() {
 		$k++;
 	}
 	$json_menus['count'] = $count;
-	return $json_menus;
+	
+	
+	
+	$menus = array (
+		'id' => -1,
+		'name' => getDomain(site_url()),
+		'count' => 0,		
+		'data' => array(),
+	);	
+	$menus['children'][] = $json_menus;
+	return $menus;
 }
 
 /**
@@ -187,7 +208,7 @@ function vsm_nav_menus_show() {
 			 <?php  }	?>								
 		</ul>
 		<div id="tabs-panel-pages" class="tabs-panel tabs-panel-active">
-			<div id="titlediv">
+			<div id="titlediv" style="margin-bottom:10px;">
 			<label title="new_page"><input type="radio" checked="checked" value="new_page" name="page" onclick="showPage(0);">New Page</label>							
 			<div id="titlewrap">
 				<label for="custom-menu-item-name" class="howto">
@@ -250,7 +271,7 @@ function vsm_nav_menus_show() {
 			<?php endif; ?> 
 			
 		</div>
-	<div class="menu-item-actions description-wide submitbox">
+	<div class="menu-item-actions description-wide submitbox" style="padding-top:6px;">
 		<a href="javascript:void(0)" id="submenu-item-add" class="submitcancel" onclick="">Add</a><span class="meta-sep"> | </span> 		
 		<a class="submitcancel" href="javascript:void(0)" onclick="$('#typediv').fadeOut(400);">Cancel</a>
 	</div>		

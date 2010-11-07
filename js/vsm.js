@@ -31,8 +31,14 @@ function showPage(id) {
 	
 function init(jsonTree) {
 	json = jsonTree;
-	canvaswidth	= maxwidth*json.count;
-	canvasheight = maxlength*json.count;	
+	var objDiv = document.getElementById("viewPort");		
+/*	
+	canvaswidth	= maxwidth*(json.count+1);
+	canvasheight = maxlength*(json.count+1);	
+*/
+	canvaswidth	= objDiv.clientWidth*2;
+	canvasheight = objDiv.clientHeight*2;	
+	
     //load json data
     st.loadJSON(json);
     //compute node positions and layout
@@ -58,7 +64,7 @@ function init(jsonTree) {
 
 //canvas height function
 function setCanvas(){
-    if($('#viewPort').size()>0) $('#viewPort').height($(window).height() - ($('#viewPort').get(0).scrollTop+ 150));
+    if($('#viewPort').size()>0) $('#viewPort').height($(window).height() - ($('#viewPort').get(0).scrollTop + 150));
 } 
 
 function setST(){
@@ -154,7 +160,7 @@ var view = {
 
 function scrollMap(){
     var objDiv = document.getElementById("viewPort");
-    objDiv.scrollTop = 6*(objDiv.scrollHeight - objDiv.clientHeight) / 10;
+    objDiv.scrollTop = 9*(objDiv.scrollHeight - objDiv.clientHeight) / 10;
     objDiv.scrollLeft = (objDiv.scrollWidth - objDiv.clientWidth) / 2;
 } 
 
@@ -684,9 +690,12 @@ $(function(){
 		//Use this method to add event handlers and styles to
 		//your node.
 		onCreateLabel: function(label, node){
-			label.id = node.id;
-			label.innerHTML = '<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a>';
-
+			label.id = node.id;		
+			if (node.id != -1)  {
+				label.innerHTML = '<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a>';			
+			} else {
+				label.innerHTML = '<b>'+node.name+'</b>';						
+			}
 		  label.onclick = function(){
 			var node_active_id = $.cookie("vsm_active_node_id");
 			$.cookie("vsm_active_node_id", node.id );		  			
