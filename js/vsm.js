@@ -383,14 +383,16 @@ function deleteMenuItem(menu, id){
 */
 		   dataType: 'json',
 		   success: function(data){
-			st.removeSubtree(id, true, 'animate', {
+			st.removeSubtree(id, true, 'replot', {
 						hideLabels: false,
 						onAfterCompute: function() {
 						var TUtil = TreeUtil;
 						var node = TUtil.getParent(json, id);									
-							st.onClick(node.id);
 							$.cookie("vsm_active_node_id", node.id ); //		  										
+							/*
+							st.onClick(node.id);							
 							scrollMap();														
+							*/
 							 var str = '';	
 							 for (var i in data.messages) {
 								str += data.messages[i];
@@ -519,11 +521,13 @@ function addSubMenuItem(id){
 		menu_item.data.menu = menu;
 		var obj = {'id' : id, children : [menu_item]};
 		node.children.push(menu_item);
-		st.addSubtree(obj, "animate", {hideLabels: false,
+		st.addSubtree(obj, "replot", {hideLabels: false,
 						onAfterCompute: function() {
-								st.onClick(data.menu_items[0].ID);
-								scrollMap();	
+						/*		
 								st.refresh();								
+								st.onClick(id);														
+								scrollMap();									
+						*/		
 								 var str = '';	
 								 for (var i in data.messages) {
 									str += data.messages[i];
