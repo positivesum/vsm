@@ -187,7 +187,16 @@ function vsm_nav_menus_show() {
 			<a href="#" id="menu-item-edit" class="submitcancel">Edit</a><span class="meta-sep"> | </span> 		
 			<a href="#" id="menu-item-preview" class="submitcancel">Preview</a>
 		</div>
-	</div>					
+	</div>
+	<p class="field-link-target description description-thin" id="menu-item-target">
+		<label for="edit-menu-item-target">
+			Link Target<br>
+			<select name="menu-item-target" class="widefat edit-menu-item-target" id="edit-menu-item-target">
+				<option value="">Same window or tab</option>
+				<option selected="selected" value="_blank">New window or tab</option>
+			</select>
+		</label>
+	</p>			
 	<div class="menu-item-actions description-wide submitbox">
 		<a href="javascript:void(0)" id="menu-item-locations" class="submitcancel">Locations</a><span id="span-locations" class="meta-sep"> | </span> 		
 		<span id="span-add"><a href="javascript:void(0)" id="menu-item-add" class="submitcancel">Add</a><span class="meta-sep"> | </span></span> 		
@@ -528,6 +537,7 @@ function ajaxVsmNavmenus() {
 			'menu-item-object' => $_REQUEST['menu-item-object'],		
 			'menu-item-parent-id' => $_REQUEST['menu-item-parent-id'],		
 			'menu-item-type' => $_REQUEST['menu-item-type'],		
+			'menu-item-target' => $_REQUEST['menu-item-target'],					
 			'menu-item-url' => $_REQUEST['menu-item-url'],			
 			'menu-item-db-id' => $_REQUEST['menu-item-db-id'],			
 			'menu-item-title' => $_REQUEST['menu-item-title']);

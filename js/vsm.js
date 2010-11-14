@@ -174,6 +174,7 @@ function showPageInfo(event, id){
 		document.getElementById('span-locations').style.display = 'inline';						
 		document.getElementById('menu-item-url').style.display = 'none';				
 		document.getElementById('link-to-original').style.display = 'none';		
+		document.getElementById('menu-item-target').style.display = 'none';						
 		document.getElementById('span-save').style.display = 'none';				
 		document.getElementById('span-delete').style.display = 'none';				
 		document.getElementById('menu-item-locations').onclick = function(){
@@ -185,13 +186,15 @@ function showPageInfo(event, id){
 		
 	} else {
 		document.getElementById('menu-item-locations').style.display = 'none';					
-		document.getElementById('span-locations').style.display = 'none';			
+		document.getElementById('span-locations').style.display = 'none';		
+		document.getElementById('link-to-original').style.display = 'none';		
 		document.getElementById('span-add').style.display = 'inline';						
 		document.getElementById('span-save').style.display = 'inline';						
 		document.getElementById('span-delete').style.display = 'inline';							
 		if (id.search('menu') != -1) {
 			document.getElementById('edit-menu-item-title').value = decodeURIComponent(node.data.name);	
 			document.getElementById('menu-item-url').style.display = 'none';							
+			document.getElementById('menu-item-target').style.display = 'none';														
 			document.getElementById('link-to-original').style.display = 'none';
 			document.getElementById('menu-item-add').onclick = function(){
 				addMenuItem(node.id);
@@ -204,6 +207,12 @@ function showPageInfo(event, id){
 			};
 		} else {
 			document.getElementById('edit-menu-item-title').value = decodeURIComponent(node.data.title);
+			document.getElementById('menu-item-target').style.display = 'block';
+			if (node.data.target != '') {
+				document.getElementById('edit-menu-item-target').selectedIndex = 1;						
+			} else {
+				document.getElementById('edit-menu-item-target').selectedIndex = 0;									
+			}
 			if (node.data.type_label != 'Custom') {
 				document.getElementById('menu-item-url').style.display = 'none';				
 				document.getElementById('link-to-original').style.display = 'block';		
@@ -571,6 +580,9 @@ function saveMenuItem(id){
 			return false;				
 		}		
 	}
+
+	var obj = document.getElementById('edit-menu-item-target');
+	var target = obj.options[obj.selectedIndex].value;
 	
 	$('#menu-item-settings').fadeOut(400);
 	
@@ -585,6 +597,7 @@ function saveMenuItem(id){
 				+ '&menu-item-parent-id=' + node.data.menu_item_parent				
 				+ '&menu-item-position=' + node.data.menu_order
 				+ '&menu-item-type=' + node.data.type
+				+ '&menu-item-target=' + target				
 				+ '&menu-item-url=' + encodeURIComponent(url)
 				+ '&menu-item-db-id=' + node.data.db_id
 				+ '&menu-item-title=' + encodeURIComponent(name),
@@ -609,6 +622,7 @@ function saveMenuItem(id){
 		node.name = name;	
 		node.data.title = name;				
 		node.data.url = url;		
+		node.data.target = target;				
 		 var str = '';	
 		 for (var i in data.messages) {
 			str += data.messages[i];
