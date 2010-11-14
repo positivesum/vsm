@@ -93,7 +93,7 @@ function setST(){
     }
     var height = test.clientHeight;
     st.config.Node.width = width;
-
+    document.body.removeChild(div);
 	
 	if (canvaswidth > maxsize) {
 		canvaswidth = maxsize;
@@ -665,7 +665,7 @@ $(function(){
 	 //does not support clearing a specific area.
 	'backgroundColor': backgroundColor
 	});
-	
+
     //Create a new ST instance
     st= new ST(canvas, {
         orientation: "top",
@@ -760,7 +760,7 @@ $(function(){
 		}
 
     });
-	
+
 	$.ajax({
 	    type: "POST",
 	    url: "/wp-admin/admin-ajax.php",
