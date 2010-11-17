@@ -443,6 +443,8 @@ function ajaxVsmNavmenus() {
 		foreach ( (array) $item_ids as $menu_item_id ) {
 			$menu_obj = get_post( $menu_item_id );
 			if ( ! empty( $menu_obj->ID ) ) {
+				$menu_obj->post_status = 'publish'; //
+				wp_update_post( $menu_obj ); //			
 				$menu_items[] = wp_setup_nav_menu_item( $menu_obj );
 			}
 		}
