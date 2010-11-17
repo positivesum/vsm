@@ -11,7 +11,7 @@ Author URI: http://www.odesk.com/users/~~94ca72c849152a57
 /* 
  * Build json of nav menus
  */
-
+ 
 $mainmenu = 0;
 
 function getDomain($url) {
@@ -65,6 +65,8 @@ function vsm_nav_menus() {
 	
 	$k = 0;
 	foreach ($menus as $menu ) {
+		$menu = wp_get_nav_menu_object( $menu->term_id );
+		if (is_nav_menu( $menu )) {
 		$json_menus['children'][] = array (
 			'id' => $menu->term_id,
 			'name' => vsm_truncated_names($menu->name),
@@ -77,6 +79,7 @@ function vsm_nav_menus() {
 		vsm_get_menus($json_menus['children'][$k], $menu_items, 0);
 		$json_menus['children'][$k]['id'] = 'menu-' . $json_menus['children'][$k]['id'];
 		$k++;
+		}
 	}
 	$json_menus['count'] = $count;
 	
@@ -451,12 +454,18 @@ function ajaxVsmNavmenus() {
 		$response['menu_items'] = $menu_items;
 		break;
 		case 'delete-menu-item':
-			$menu_item_id = (int) $_REQUEST['menu-item'];
-			if ( is_nav_menu_item( $menu_item_id ) ) {
-				if ( wp_delete_post( $menu_item_id, true ) ) {
-
-					$messages[] = '<div id="message" class="updated"><p>' . __('The menu item has been successfully deleted.') . '</p></div>';
+			$delete = false;
+			$menu_items = explode(",", $_REQUEST['menu-item']);
+			foreach ($menu_items as $key => $value) {
+				$menu_item_id = (int) $value;
+				if ( is_nav_menu_item( $menu_item_id ) ) {
+					if ( wp_delete_post( $menu_item_id, true ) ) {
+						$delete = true;
+					}
 				}
+			}
+			if ($delete) {
+				$messages[] = '<div id="message" class="updated"><p>' . __('The menu item has been successfully deleted.') . '</p></div>';			
 			}
 			break;
 		case 'delete':
@@ -585,6 +594,5 @@ function ajaxVsmNavmenus() {
 	echo (json_encode($response));
 	die();	
 }
-
 
 ?>

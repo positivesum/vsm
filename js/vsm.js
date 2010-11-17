@@ -328,7 +328,7 @@ function deleteMenu(id) {
 		   dataType: 'json',
 		   success: function(data){
 			var menu_id = "menu-" + id;			
-			st.removeSubtree(menu_id, true, 'animate', {
+			st.removeSubtree(menu_id, true, 'replot', {
 						hideLabels: false,
 						onAfterCompute: function() {
 							$.cookie("vsm_active_node_id", st.root ); //		  																
@@ -377,14 +377,36 @@ function saveMenu(id){
 	}
 }
 
+function getSubtree(subtree) {
+	var ids = [subtree.id];
+	for (var i=0;i<subtree.children.length;i++) {
+		if (subtree.children[i].children.length > 0) {
+			var aids = getSubtree(subtree.children[i]);	
+			for (var j=0;j<aids.length;j++) {
+				ids.push(aids[j]);
+			}
+		} else {
+			ids.push(subtree.children[i].id);		
+		}		
+	}
+	return ids;
+}
+
 function deleteMenuItem(menu, id){
+
+	var subtree = TreeUtil.getSubtree(json, id);
+	var ids = [id];
+	if (subtree != null) {
+		ids = getSubtree(subtree);
+	}
+	
 	var r=confirm("You are about to permanently delete this menu item.\n 'Cancel' to stop, 'OK' to delete.");
 	if (r==true) {
 		$('#menu-item-settings').fadeOut(400);
 		$.ajax({
 		   type: "POST",
 		    url: "/wp-admin/admin-ajax.php",
-		    data: 'action=vsm&operation=delete-menu-item&menu=' + menu + '&menu-item='  + id,
+		    data: 'action=vsm&operation=delete-menu-item&menu=' + menu + '&menu-item='  + ids,
 /*
 		   url: "/wp-content/plugins/vsm/nav-menus-api.php",
 		   data: 'action=delete-menu-item&menu=' + menu 
@@ -392,22 +414,23 @@ function deleteMenuItem(menu, id){
 */
 		   dataType: 'json',
 		   success: function(data){
-			st.removeSubtree(id, true, 'replot', {
-						hideLabels: false,
-						onAfterCompute: function() {
-						var TUtil = TreeUtil;
-						var node = TUtil.getParent(json, id);									
-							$.cookie("vsm_active_node_id", node.id ); //		  										
-							/*
-							st.onClick(node.id);							
-							scrollMap();														
-							*/
-							 var str = '';	
-							 for (var i in data.messages) {
-								str += data.messages[i];
-							 }							
-							$("#messages").html(str);						
-						}
+			st.removeSubtree(id, true, 'animate', {
+				hideLabels: false,
+				onAfterCompute: function() {
+					var TUtil = TreeUtil;
+					var node = TUtil.getParent(json, id);									
+					st.onClick(node.id);																			
+					$.cookie("vsm_active_node_id", node.id ); //		  												   				
+					/*
+					st.onClick(node.id);														
+					scrollMap();														
+					*/
+					 var str = '';	
+					 for (var i in data.messages) {
+						str += data.messages[i];
+					 }							
+					 jQuery("#messages").html(str);																			 
+				}
 			});		   
 
 		   }
