@@ -203,9 +203,9 @@ function vsm_nav_menus_show() {
 	<div class="menu-item-actions description-wide submitbox">
 		<a href="javascript:void(0)" id="menu-item-locations" class="submitcancel">Locations</a><span id="span-locations" class="meta-sep"> | </span> 		
 		<span id="span-add"><a href="javascript:void(0)" id="menu-item-add" class="submitcancel">Add</a><span class="meta-sep"> | </span></span> 		
-		<span id="span-delete"><a href="javascript:void(0)" id="menu-item-delete" class="submitdelete">Remove</a><span class="meta-sep"> | </span></span>
 		<span id="span-save"><a href="javascript:void(0)" id="menu-item-save" class="submitcancel" >Save</a><span class="meta-sep"> | </span></span>		
 		<a class="submitcancel" href="javascript:void(0)" onclick="$('#menu-item-settings').fadeOut(400);">Cancel</a>
+		<span id="span-delete" style="float:right"><a href="javascript:void(0)" id="menu-item-delete" class="submitdelete">Remove</a></span>		
 	</div>
 </div><!-- .menu-item-settings-->
 
