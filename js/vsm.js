@@ -31,20 +31,24 @@ function showPage(id) {
 	
 function init(jsonTree) {
 	json = jsonTree;
-	var objDiv = document.getElementById("viewPort");		
 /*	
 	canvaswidth	= maxwidth*(json.count+1);
 	canvasheight = maxlength*(json.count+1);	
-*/
+	
 	canvaswidth	= objDiv.clientWidth*2;
-	canvasheight = objDiv.clientHeight*2;	
+	canvasheight = objDiv.clientHeight*2;			
+*/
+
 	
     //load json data
     st.loadJSON(json);
     //compute node positions and layout
     st.compute();
 
-    setST();
+    setST();		
+
+	calcSize();
+	
 	var node_active_id = $.cookie("vsm_active_node_id");
 	if (node_active_id) {
 	    var TUtil = TreeUtil;
@@ -66,6 +70,56 @@ function init(jsonTree) {
 function setCanvas(){
     if($('#viewPort').size()>0) $('#viewPort').height($(window).height() - ($('#viewPort').get(0).scrollTop + 150));
 } 
+
+function calcSize() {
+	var levels = 0;
+	var GUtil = Graph.Util;
+	GUtil.eachNode(st.graph, function(n) {  
+		if (levels <  n._depth) {
+			levels = n._depth;
+		}
+	});	
+
+	var nodeArray = [];	
+	for (var i=0;i<levels;i++) {
+		nodeArray[i] = 0;
+	}
+
+	GUtil.eachNode(st.graph, function(n) {  
+		var count = 0;
+		GUtil.eachSubnode(n, function(elem) {
+			count++;
+        });
+	
+		if (nodeArray[n._depth] <  count) {
+			nodeArray[n._depth] = count;
+		}
+	});	
+
+	var maxcount = 1;
+	
+	for (var i=0;i<nodeArray.length;i++) {
+		maxcount += nodeArray[i];
+	}
+
+	var objDiv = document.getElementById("viewPort");		
+	
+	if (view.state == 'map') {
+		canvaswidth = maxcount*st.config.Node.width/2;
+		canvasheight = (levels+1)*st.config.Node.height*2+objDiv.clientHeight/2;
+	} else {
+		canvaswidth = maxcount*st.config.Node.height/2;
+		canvasheight = (levels+1)*st.config.Node.width*2+objDiv.clientHeight/2;	
+	}	
+
+	if (canvaswidth < objDiv.clientWidth) {
+		canvaswidth = objDiv.clientWidth;
+	}
+	if (canvasheight < objDiv.clientHeight) {
+		canvasheight = objDiv.clientHeight;
+	}	
+    st.canvas.resize(canvaswidth, canvasheight);		
+}
 
 function setST(){
     var maxtext = '';
@@ -94,14 +148,6 @@ function setST(){
     var height = test.clientHeight;
     st.config.Node.width = width;
     document.body.removeChild(div);
-	
-	if (canvaswidth > maxsize) {
-		canvaswidth = maxsize;
-	}
-	if (canvasheight > maxsize) {
-		canvasheight = maxsize;
-	}	
-    st.canvas.resize(canvaswidth, canvasheight);	
 } 
 
 
@@ -113,8 +159,11 @@ var view = {
         if (this.getState() == 'outline') {
             $('#viewPort, #viewToggles ul').addClass('map').removeClass('outline');
             this.state = 'map';
+			calcSize();			
             st.switchPosition('top', "animate", {
-                onComplete: function(){}
+                onComplete: function(){
+//					st.refresh();
+				}
             });
         }
     },
@@ -122,8 +171,11 @@ var view = {
         if (this.getState() == 'map') {
             $('#viewPort, #viewToggles ul').addClass('outline').removeClass('map');
             this.state = 'outline';
+			calcSize();			
             st.switchPosition('left', "animate", {
-                onComplete: function(){}
+                onComplete: function(){ 
+//					st.refresh();
+				}
             });
         }
 
