@@ -195,8 +195,9 @@ function vsm_nav_menus_show() {
 		<label for="edit-menu-item-target">
 			Link Target<br>
 			<select name="menu-item-target" class="widefat edit-menu-item-target" id="edit-menu-item-target">
-				<option value="">Same window or tab</option>
-				<option selected="selected" value="_blank">New window or tab</option>
+				<option value="">open same window or tab.</option>
+				<option selected="selected" value="_blank">open new window or tab.</option>
+				<option value="_nothing">do nothing on click.</option>
 			</select>
 		</label>
 	</p>			
@@ -403,6 +404,19 @@ add_action('admin_menu', 'vsm_plugin_menu');
 add_action('admin_menu', 'vsm_options_menu');
 
 add_action('wp_ajax_vsm', 'ajaxVsmNavmenus');
+
+add_filter( 'walker_nav_menu_start_el', 'do_nothing_onclick'); // do nothing on click.
+
+function do_nothing_onclick($item_output) {
+	$pos = strrpos($item_output, "_nothing");
+	if ($pos === false) { // note: three equal signs
+		return $item_output;
+	} else {
+		$item_output =  preg_replace('/href/', 'href="javascript:void(0)" onclick="return false;"', $item_output);
+	}
+	return $item_output;
+}
+
 
 
 function ajaxVsmNavmenus() {
