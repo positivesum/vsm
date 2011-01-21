@@ -192,9 +192,8 @@ function vsm_nav_menus_show() {
 		</div>
 	</div>
 	<p class="field-link-target description description-thin" id="menu-item-target">
-		<label for="edit-menu-item-target">
-			Link Target<br>
-			<select name="menu-item-target" class="widefat edit-menu-item-target" id="edit-menu-item-target">
+		<label for="edit-menu-item-target">Link will
+			<select name="menu-item-target" class="edit-menu-item-target" id="edit-menu-item-target">
 				<option value="">open same window or tab.</option>
 				<option selected="selected" value="_blank">open new window or tab.</option>
 				<option value="_nothing">do nothing on click.</option>
