@@ -561,7 +561,8 @@ function ajaxVsmNavmenus() {
 			'menu-item-object' => $_REQUEST['menu-item-object'],		
 			'menu-item-parent-id' => $_REQUEST['menu-item-parent-id'],		
 			'menu-item-type' => $_REQUEST['menu-item-type'],		
-			'menu-item-target' => $_REQUEST['menu-item-target'],					
+			'menu-item-target' => $_REQUEST['menu-item-target'],
+			'menu-item-position' => $_REQUEST['menu-item-position'],
 			'menu-item-url' => $_REQUEST['menu-item-url'],			
 			'menu-item-db-id' => $_REQUEST['menu-item-db-id'],			
 			'menu-item-title' => $_REQUEST['menu-item-title']);
