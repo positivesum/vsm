@@ -322,7 +322,8 @@ function saveMenuLocations(){
 		$('#nav-menu-theme-locations').fadeOut(400);
 		$.ajax({
 		   type: "POST",
-		   url: "/wp-admin/admin-ajax.php",
+//		   url: "/wp-admin/admin-ajax.php",
+		   url: ajaxurl,
 		   data: locations,
 		   dataType: 'json',
 		   success: function(data){
@@ -342,7 +343,8 @@ function addMenu(){
 		$('#menu-item-settings').fadeOut(400);
 		$.ajax({
 		   type: "POST",
-		    url: "/wp-admin/admin-ajax.php",
+//		    url: "/wp-admin/admin-ajax.php",
+			url: ajaxurl,
 		    data: 'action=vsm&operation=add-menu&menu=0&menu-name=' + encodeURIComponent(name),
 //		   url: "/wp-content/plugins/vsm/nav-menus-api.php",
 //		   data: 'action=add-menu&menu=0&menu-name=' + encodeURIComponent(name),
@@ -378,7 +380,8 @@ function deleteMenu(id) {
 		$('#menu-item-settings').fadeOut(400);
 		$.ajax({
 		   type: "POST",
-		    url: "/wp-admin/admin-ajax.php",
+//		    url: "/wp-admin/admin-ajax.php",
+			url: ajaxurl,
 		    data: 'action=vsm&operation=delete&menu=' + id,
 //		   url: "/wp-content/plugins/vsm/nav-menus-api.php",
 //		   data: 'action=delete&menu=' + id,
@@ -410,7 +413,8 @@ function saveMenu(id){
 		$('#menu-item-settings').fadeOut(400);
 		$.ajax({
 		   type: "POST",
-		    url: "/wp-admin/admin-ajax.php",
+//		    url: "/wp-admin/admin-ajax.php",
+			url: ajaxurl,
 		    data: 'action=vsm&operation=update-menu&menu='+id + '&menu-name=' + encodeURIComponent(name),
 
 //		   url: "/wp-content/plugins/vsm/nav-menus-api.php",
@@ -462,7 +466,8 @@ function deleteMenuItem(menu, id){
 		$('#menu-item-settings').fadeOut(400);
 		$.ajax({
 		   type: "POST",
-		    url: "/wp-admin/admin-ajax.php",
+//		    url: "/wp-admin/admin-ajax.php",
+			url: ajaxurl,
 		    data: 'action=vsm&operation=delete-menu-item&menu=' + menu + '&menu-item='  + ids,
 /*
 		   url: "/wp-content/plugins/vsm/nav-menus-api.php",
@@ -597,7 +602,8 @@ function addSubMenuItem(id){
 	
 	$.ajax({
 	   type: "POST",
-	    url: "/wp-admin/admin-ajax.php",
+//	    url: "/wp-admin/admin-ajax.php",
+	    url: ajaxurl,
 	    data: 'action=vsm&'  + post,
 /*
 	   url: "/wp-content/plugins/vsm/nav-menus-api.php",
@@ -672,7 +678,8 @@ function saveMenuItem(id){
 	
 	$.ajax({
 	   type: "POST",
-	    url: "/wp-admin/admin-ajax.php",
+//	    url: "/wp-admin/admin-ajax.php",
+	    url: ajaxurl,
 	    data: 'action=vsm&operation=update-menu-item&menu='
 				+ node.data.menu 
 				+ '&menu-item-id=' + id		
@@ -865,7 +872,8 @@ $(function(){
 
 	$.ajax({
 	    type: "POST",
-	    url: "/wp-admin/admin-ajax.php",
+//	    url: "/wp-admin/admin-ajax.php",
+	    url: ajaxurl,
 	    data: 'action=vsm&operation=load-nav-menus',
 //	   url: "/wp-content/plugins/vsm/nav-menus-api.php",
 //	   data: 'action=load-nav-menus',
