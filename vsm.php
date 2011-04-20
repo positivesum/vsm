@@ -155,7 +155,7 @@ function vsm_nav_menus_show() {
 
 <div class="wrap" id="wrap">
 <?php screen_icon(); ?>
-<h2>Visual Admin</h2>
+<h2>Visual Admin Tree View</h2>
 <div id="messages"></div>
 <div id="canvas">
     <div class="canvasWrap">
@@ -304,11 +304,19 @@ function vsm_plugin_admin_init()  {
 }
 
 function vsm_plugin_menu() {
-    
-	$page = add_dashboard_page('Visual Admin', 'Visual Admin', 'publish_pages', 'vsm', 'vsm_plugin_theme');
+	// $page = add_dashboard_page('Visual Admin', 'Visual Admin', 'publish_pages', 'vsm', 'vsm_plugin_theme');
+	
+	 // add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position );
+	add_menu_page( 'Visual Admin', 'Visual Admin', 'manage_options', 'vsm', 'vsm_plugin_options');	
+	
+	// add_submenu_page( $parent_slug, $page_title, $menu_title, $capability, $menu_slug, $function )
+	$page = add_submenu_page( 'vsm', 'Tree View', 'Tree View', 'publish_pages', 'vsm-tree-view', 'vsm_tree_view' );
      /* Using registered $page handle to hook stylesheet loading */
 	add_action('admin_print_styles-' . $page, 'vsm_plugin_admin_styles');
 	add_action('admin_print_scripts-' . $page, 'vsm_plugin_admin_scripts');	
+	
+	add_submenu_page( 'vsm', 'List View', 'List View', 'publish_pages', 'vsm-list-view', 'vsm_list_view' );
+	
 }
 
 function vsm_plugin_admin_styles() {
@@ -326,18 +334,31 @@ global $is_IE;
 	wp_enqueue_script('vsm');	
 }
 
-function vsm_plugin_theme() {
+function vsm_tree_view() {
   if (!current_user_can('publish_pages'))  {
     wp_die( __('You do not have sufficient permissions to access this page.') );
   }
 	vsm_nav_menus_show();
 }
 
+function vsm_list_view() {
+  if (!current_user_can('publish_pages'))  {
+    wp_die( __('You do not have sufficient permissions to access this page.') );
+  }
+	?>		
+	<div class="wrap">
+	<?php screen_icon(); ?>
+	<h2>Visual Admin List View</h2>
+	</div>
+	<?php	
+}
+
+
 function vsm_options_menu() {
 	if ( ! current_user_can('manage_options') )
 		return;
     /* adds our admin panel */
-	$page = add_options_page('Visual Admin', 'Visual Admin', 'manage_options', 'vsm-manage-options', 'vsm_plugin_options');
+	// $page = add_options_page('Visual Admin', 'Visual Admin', 'manage_options', 'vsm-manage-options', 'vsm_plugin_options');
 
 	if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'vsm-manage-options') {
 		check_admin_referer('vsm-manage-options');
