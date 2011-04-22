@@ -341,6 +341,39 @@ function vsm_tree_view() {
 	vsm_nav_menus_show();
 }
 
+function menu_rows(&$output, $menus, $level) {
+	$level++;
+	foreach ($menus as $menu) {
+		if (isset($menu['name'])) {
+			$padding = str_repeat("&nbsp;&nbsp;", $level);
+			$name = $menu['name'];
+			$type = '';
+			$url = '';
+			$status = '';
+			if (is_object($menu['data'])) {
+				$data = $menu['data'];
+				if (isset($data->term_id)) {
+					$type = 'Menu';
+					$name = '<b>' . $name . '</b>';
+				} else {
+					$type = $data->object;
+					$url = '<a href="' . $data->url . '">' . $data->title . '</a>';
+					$status = $data->post_status;
+				}
+			}
+			$output .= '<tr>
+							<td>' . $padding . ' ' . $name . '</td>
+							<td>' . $type . '</td>
+							<td>' . $url . '</td>
+							<td>' . $status . '</td>
+						</tr>';
+			if (is_array($menu['children'])) {
+				menu_rows($output, $menu['children'], $level);
+			}
+		}
+	}
+}
+
 function vsm_list_view() {
   if (!current_user_can('publish_pages'))  {
     wp_die( __('You do not have sufficient permissions to access this page.') );
@@ -349,8 +382,34 @@ function vsm_list_view() {
 	<div class="wrap">
 	<?php screen_icon(); ?>
 	<h2>Visual Admin List View</h2>
+		<table class="widefat fixed" cellspacing="0">
+			<thead>
+			<tr>
+				<th width="45%">Title</th>
+				<th width="5%">Type</th>
+				<th width="45%">URL</th>
+				<th width="5%">Status</th>
+			</tr>
+			</thead>
+			<tfoot>
+			<tr>
+				<th>Title</th>
+				<th>Type</th>
+				<th>URL</th>
+				<th>Status</th>
+			</tr>
+			</tfoot>
+			<tbody>
+<?php 
+			$menus = vsm_nav_menus();
+			$output = '<tr><td colspan="4"><strong>' . $menus['name'] . '</strong></td></tr>';
+			menu_rows($output, $menus['children'], 0);
+			echo($output);
+?>			
+			</tbody>
+		</table>	
 	</div>
-	<?php	
+<?php	
 }
 
 
