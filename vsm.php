@@ -95,6 +95,25 @@ function vsm_nav_menus() {
 	return $menus;
 }
 
+function vsm_nav_menu($term_id) {
+	global $mainmenu;
+	$menu = wp_get_nav_menu_object( $term_id );
+	if (is_nav_menu( $menu )) {
+		$json_menus = array (
+			'id' => $menu->term_id,
+			'name' => $menu->name,
+			'data' => $menu,
+			'children' => array()
+		);
+		$mainmenu = $menu->term_id;
+		$menu_items = wp_get_nav_menu_items( $menu->term_id, array('post_status' => 'any') );
+		vsm_get_menus($json_menus, $menu_items, 0);
+	} else {
+		$json_menus = array ();
+	}
+	return $json_menus;
+}
+
 /**
  * Displays a box for the nav menu theme locations.
  */
@@ -315,7 +334,8 @@ function vsm_plugin_menu() {
 	add_action('admin_print_styles-' . $page, 'vsm_plugin_admin_styles');
 	add_action('admin_print_scripts-' . $page, 'vsm_plugin_admin_scripts');	
 	
-	add_submenu_page( 'vsm', 'List View', 'List View', 'publish_pages', 'vsm-list-view', 'vsm_list_view' );
+	$page = add_submenu_page( 'vsm', 'List View', 'List View', 'publish_pages', 'vsm-list-view', 'vsm_list_view' );
+	add_action('admin_print_scripts-' . $page, 'vsm_plugin_admin_scripts_list');	
 	
 }
 
@@ -334,6 +354,10 @@ global $is_IE;
 	wp_enqueue_script('vsm');	
 }
 
+function vsm_plugin_admin_scripts_list() {
+	wp_enqueue_script('vsm-list', WP_PLUGIN_URL . '/vsm/js/vsm-list.js', array('jquery'), '1.0');
+}
+
 function vsm_tree_view() {
   if (!current_user_can('publish_pages'))  {
     wp_die( __('You do not have sufficient permissions to access this page.') );
@@ -341,15 +365,19 @@ function vsm_tree_view() {
 	vsm_nav_menus_show();
 }
 
-function menu_rows(&$output, $menus, $level) {
-	$level++;
+function menu_rows(&$output, $menus, $level, $edit) {
+	static $rowclass;
+
 	foreach ($menus as $menu) {
+
 		if (isset($menu['name'])) {
-			$padding = str_repeat("&nbsp;&nbsp;", $level);
 			$name = $menu['name'];
 			$type = '';
 			$url = '';
 			$status = '';
+			$object_id = null;
+			$link = '';
+			
 			if (is_object($menu['data'])) {
 				$data = $menu['data'];
 				if (isset($data->term_id)) {
@@ -357,18 +385,30 @@ function menu_rows(&$output, $menus, $level) {
 					$name = '<b>' . $name . '</b>';
 				} else {
 					$type = $data->object;
-					$url = '<a href="' . $data->url . '">' . $data->title . '</a>';
+					$url = '<a href="' . $data->url . '">' . $data->url . '</a>';
 					$status = $data->post_status;
+					$object_id = $data->object_id;
 				}
 			}
-			$output .= '<tr>
-							<td>' . $padding . ' ' . $name . '</td>
+			$rowclass = 'alternate' == $rowclass ? '' : 'alternate';
+			
+			if ($level != '') {
+				$link = $edit . ' > <a href="' . get_edit_post_link($object_id, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $name . '</a>';
+				$name = $level . ' > '. $name;
+			} else {
+				$link = $edit . '<a href="' . get_edit_post_link($object_id, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $name . '</a>';
+			}
+			
+			
+			$output .= '<tr class="'.$rowclass.'">
+							<td>' . $name . '</td>
 							<td>' . $type . '</td>
+							<td>' . $link . '</td>
 							<td>' . $url . '</td>
 							<td>' . $status . '</td>
 						</tr>';
 			if (is_array($menu['children'])) {
-				menu_rows($output, $menu['children'], $level);
+				menu_rows($output, $menu['children'], $name, $link);
 			}
 		}
 	}
@@ -380,30 +420,48 @@ function vsm_list_view() {
   }
 	?>		
 	<div class="wrap">
-	<?php screen_icon(); ?>
-	<h2>Visual Admin List View</h2>
+		<?php screen_icon(); ?>
+		<h2>Visual Admin List View</h2>
+		<div class="tablenav">
+			<label for="nav-menu">Menu: </label>
+			<?php
+			// Get all nav menus
+			$menus = wp_get_nav_menus();
+			if (count($menus) > 0): ?>
+			<select class="select-nav-menu" id="nav-menu">
+			<?php foreach( (array) $menus as $menu ) : ?>
+			<option value="<?php echo esc_attr($menu->term_id) ?>"><?php echo esc_html($menu->name); ?></option>
+			<?php endforeach; ?>
+			</select>			
+			<?php else: ?> 
+			No Menus
+			<?php endif; ?> 
+		</div>
 		<table class="widefat fixed" cellspacing="0">
 			<thead>
 			<tr>
-				<th width="45%">Title</th>
+				<th width="30%">Menu Item</th>
 				<th width="5%">Type</th>
-				<th width="45%">URL</th>
+				<th width="30%">Links To</th>
+				<th width="30%">Url</th>
 				<th width="5%">Status</th>
 			</tr>
 			</thead>
 			<tfoot>
 			<tr>
-				<th>Title</th>
+				<th>Menu Item</th>
 				<th>Type</th>
-				<th>URL</th>
+				<th>Links To</th>
+				<th>Url</th>
 				<th>Status</th>
 			</tr>
 			</tfoot>
-			<tbody>
+			<tbody id="nav-menu-items" >
 <?php 
-			$menus = vsm_nav_menus();
-			$output = '<tr><td colspan="4"><strong>' . $menus['name'] . '</strong></td></tr>';
-			menu_rows($output, $menus['children'], 0);
+		
+			$menus = vsm_nav_menu($menus[0]->term_id);
+			$output = '';
+			menu_rows($output, $menus['children'], '', '');
 			echo($output);
 ?>			
 			</tbody>
@@ -495,8 +553,6 @@ function do_nothing_onclick($item_output) {
 	}
 	return $item_output;
 }
-
-
 
 function ajaxVsmNavmenus() {
       // Load all the nav menu interface functions
@@ -651,7 +707,15 @@ function ajaxVsmNavmenus() {
 		case 'load-nav-menus':		
 			$json_menus = vsm_nav_menus();
 			$response['json_menus'] = $json_menus;
-		break;	
+		break;
+		case 'get-menu':
+			if ( is_nav_menu( $nav_menu_selected_id ) ) {
+				$menus = vsm_nav_menu($nav_menu_selected_id);
+				$output = '';
+				menu_rows($output, $menus['children'], '', '');
+				$response['json_menu'] = $output;
+			}
+		break;
 	}
 
 	// Get all nav menus
