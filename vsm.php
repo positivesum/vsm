@@ -365,6 +365,19 @@ function vsm_tree_view() {
 	vsm_nav_menus_show();
 }
 
+function get_parents(&$output, $post_id) {
+	$post = get_post($post_id);
+	$link = '<a href="' . get_edit_post_link($post->ID, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $post->post_title . '</a>';
+	if ($output != '') {
+		$output = $link . ' > ' . $output;
+	} else {
+		$output = $link;
+	}
+	if ($post->post_parent != null) {
+		get_parents($output, $post->post_parent);
+	}
+}
+
 function menu_rows(&$output, $menus, $level, $edit) {
 	static $rowclass;
 
@@ -380,6 +393,7 @@ function menu_rows(&$output, $menus, $level, $edit) {
 			
 			if (is_object($menu['data'])) {
 				$data = $menu['data'];
+				
 				if (isset($data->term_id)) {
 					$type = 'Menu';
 					$name = '<b>' . $name . '</b>';
@@ -388,17 +402,15 @@ function menu_rows(&$output, $menus, $level, $edit) {
 					$url = '<a href="' . $data->url . '">' . $data->url . '</a>';
 					$status = $data->post_status;
 					$object_id = $data->object_id;
+					if ($object_id != null) {
+						get_parents($link, $object_id);
+					}
 				}
 			}
 			$rowclass = 'alternate' == $rowclass ? '' : 'alternate';
-			
 			if ($level != '') {
-				$link = $edit . ' > <a href="' . get_edit_post_link($object_id, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $name . '</a>';
 				$name = $level . ' > '. $name;
-			} else {
-				$link = $edit . '<a href="' . get_edit_post_link($object_id, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $name . '</a>';
 			}
-			
 			
 			$output .= '<tr class="'.$rowclass.'">
 							<td>' . $name . '</td>
