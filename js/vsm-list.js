@@ -10,7 +10,7 @@ jQuery(function(){
 		   dataType: 'json',	   
 		   success: function(data){
 				jQuery("#nav-menu-items").html(data.json_menu);
-				jQuery('.button-secondary').click(function(){
+				jQuery('#nav-menu-items .button-secondary').click(function(){
 					var menu = jQuery("#nav-menu option:selected").val();
 					var str = jQuery(this).attr('id');
 					var parts = str.split('|');
@@ -41,7 +41,7 @@ jQuery(function(){
 		 });			
 	});
 	
-    jQuery('.button-secondary').click(function(){
+    jQuery('#nav-menu-items .button-secondary').click(function(){
 		var menu = jQuery("#nav-menu option:selected").val();
 		var str = jQuery(this).attr('id');
 		var parts = str.split('|');
@@ -79,7 +79,7 @@ jQuery(function(){
 						   dataType: 'json',	   
 						   success: function(data){
 								jQuery("#nav-menu-items").html(data.json_menu);
-								jQuery('.button-secondary').click(function(){
+								jQuery('#nav-menu-items .button-secondary').click(function(){
 									var menu = jQuery("#nav-menu option:selected").val();
 									var str = jQuery(this).attr('id');
 									var parts = str.split('|');
@@ -111,5 +111,32 @@ jQuery(function(){
 					
 					}}
 	});	
+
+    jQuery('#nav-page-items .button-secondary').click(function(){
+		deletePage(this);
+    });
+
 	
 });
+
+function deletePage(obj) {
+	if (confirm("Are you sure to delete the page and supages?")) {
+		var id = jQuery(obj).attr('id');
+		jQuery.ajax({
+			type: "POST",
+			url: "/wp-admin/admin-ajax.php",
+			data: 'action=vsm&operation=delete-page&post-id=' + id,
+		   dataType: 'json',	   
+		   success: function(data){
+				jQuery("#nav-page-items").html(data.json_page);
+				jQuery('#nav-page-items .button-secondary').click(function(){
+					deletePage(this);
+				});
+		   },
+			error: function(XMLHttpRequest, textStatus, errorThrown){
+				alert(textStatus);
+			}	   
+		 });			
+	}		
+	return false;
+}

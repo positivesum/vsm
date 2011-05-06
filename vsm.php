@@ -370,9 +370,26 @@ function vsm_tree_view() {
 	vsm_nav_menus_show();
 }
 
+function get_menuitem($post_id) {
+	$menus = wp_get_nav_menus();
+	$menuitem = '';
+	foreach ($menus as $menu ) {
+		$menu = wp_get_nav_menu_object( $menu->term_id );
+		if (is_nav_menu( $menu )) {
+			$menu_items = wp_get_nav_menu_items( $menu->term_id, array('post_status' => 'any') );
+			foreach ($menu_items as $menu_item) {
+				if ($menu_item->ID == $post_id) {
+					return $menu_item;
+				}
+			}
+		}
+	}
+	return false;
+}
+
 function get_parents(&$output, $post_id) {
 	$post = get_post($post_id);
-	$link = '<a href="' . get_edit_post_link($post->ID, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . $post->post_title . '</a>';
+	$link = '<a href="' . get_edit_post_link($post->ID, true) . '" title="' . esc_attr(__('Edit this item')) . '">' . trim($post->post_title) . '</a>';
 	if ($output != '') {
 		$output = $link . ' > ' . $output;
 	} else {
@@ -380,6 +397,19 @@ function get_parents(&$output, $post_id) {
 	}
 	if ($post->post_parent != null) {
 		get_parents($output, $post->post_parent);
+	}
+}
+
+function get_menu_item_parents(&$output, $menu_item_id) {
+	$menu_item = get_menuitem($menu_item_id);
+	$link = '<a href="' . $menu_item->url . '" title="' . esc_attr(__('Edit this item')) . '">' . trim($menu_item->title) . '</a>';
+	if ($output != '') {
+		$output = $link . ' > ' . $output;
+	} else {
+		$output = $link;
+	}
+	if ($menu_item->menu_item_parent > 0) {
+		get_menu_item_parents($output, $menu_item->menu_item_parent);
 	}
 }
 
@@ -436,57 +466,139 @@ function vsm_list_view() {
   if (!current_user_can('publish_pages'))  {
     wp_die( __('You do not have sufficient permissions to access this page.') );
   }
-	?>		
+	?>
 	<div class="wrap">
 		<?php screen_icon(); ?>
 		<h2>Visual Admin List View</h2>
-		<div class="tablenav">
-			<label for="nav-menu">Menu: </label>
-			<?php
-			// Get all nav menus
-			$menus = wp_get_nav_menus();
-			if (count($menus) > 0): ?>
-			<select class="select-nav-menu" id="nav-menu">
-			<?php foreach( (array) $menus as $menu ) : ?>
-			<option value="<?php echo esc_attr($menu->term_id) ?>"><?php echo esc_html($menu->name); ?></option>
-			<?php endforeach; ?>
-			</select>			
-			<?php else: ?> 
-			No Menus
-			<?php endif; ?> 
-		</div>
-		<table class="widefat fixed" cellspacing="0">
-			<thead>
-			<tr>
-				<th width="24%">Menu Item</th>
-				<th width="4%">Type</th>
-				<th width="30%">Links To</th>
-				<th width="7%">&nbsp;</th>
-				<th width="30%">Url</th>
-				<th width="5%">Status</th>
-			</tr>
-			</thead>
-			<tfoot>
-			<tr>
-				<th>Menu Item</th>
-				<th>Type</th>
-				<th>Links To</th>
-				<th>&nbsp;</th>
-				<th>Url</th>
-				<th>Status</th>
-			</tr>
-			</tfoot>
-			<tbody id="nav-menu-items" >
-<?php 
-		
-			$menus = vsm_nav_menu($menus[0]->term_id);
-			$output = '';
-			menu_rows($output, $menus['children'], '', '');
-			echo($output);
-?>			
-			</tbody>
-		</table>	
+		<div id="menu-management">
+			<div class="nav-tabs-nav">
+				<div class="nav-tabs-wrapper">
+					<div class="nav-tabs" style="padding: 0px; margin-left: 0px;">
+	<?php
+	if (isset($_REQUEST['list-pages'])) {
+	?>
+						<a class="nav-tab hide-if-no-js" href="admin.php?page=vsm-list-view">Menus</a>
+						<span class="nav-tab nav-tab-active">Pages</span>
+					</div>
+				</div>
+			</div>
+			<div class="menu-edit">
+				<div id="nav-menu-header">
+					<div style="padding: 5px 10px;"></div>
+				</div>
+				
+				<table class="widefat fixed" cellspacing="0">
+					<thead>
+					<tr>
+						<th width="30%">Page</th>
+						<th width="30%">Menus</th>
+						<th width="28%">Url</th>
+						<th width="5%">Status</th>
+						<th width="7%">&nbsp;</th>
+					</tr>
+					</thead>
+					<tfoot>
+					<tr>
+						<th>Page</th>
+						<th>Menus</th>
+						<th>Url</th>
+						<th>Status</th>
+						<th>&nbsp;</th>
+					</tr>
+					</tfoot>
+					<tbody id="nav-page-items">
+		<?php 
+				$pages = get_pages(); 
+				if (count($pages) > 0): 
+		?>
+				<?php foreach( (array) $pages as $p ) : 
+					$menu = '';
+					$menu_items = wp_get_associated_nav_menu_items( $p->ID );
+					// $menuitem = get_menuitem($p->ID);
+					if (count($menu_items) > 0) {
+						get_menu_item_parents($menu, $menu_items[0]);
+					}	
+					$link = '';
+					get_parents($link, $p->ID);
+				?>
+				<tr>
+					<td><?php echo($link); ?></td>
+					<td><?php echo($menu); ?></td>
+					<td><a href="<?php echo get_page_link($p->ID); ?>"><?php echo get_page_link($p->ID); ?></a></td>
+					<td><?php echo($p->post_status); ?></td>
+					<td><input type="button" value="Delete" class="button-secondary" id="<?php echo($p->ID); ?>" name=""></td>
+				</tr>
+				<?php endforeach; ?>
+				<?php else: ?> 
+				<tr><td colspan="5">No Pages</td></tr>
+				<?php endif; ?> 
+					</tbody>
+				</table>
+			</div>
+			
+	<?php 
+	} else {
+	?>
+						<span class="nav-tab nav-tab-active">Menus</span>
+						<a class="nav-tab hide-if-no-js" href="admin.php?page=vsm-list-view&list-pages">Pages</a>
+					</div>
+				</div>
+			</div>	
+			<div class="menu-edit">
+				<div id="nav-menu-header">
+					<div style="padding: 5px 10px;">
+						<label for="nav-menu">Menu: </label>
+						<?php
+						// Get all nav menus
+						$menus = wp_get_nav_menus();
+						if (count($menus) > 0): ?>
+						<select class="select-nav-menu" id="nav-menu">
+						<?php foreach( (array) $menus as $menu ) : ?>
+						<option value="<?php echo esc_attr($menu->term_id) ?>"><?php echo esc_html($menu->name); ?></option>
+						<?php endforeach; ?>
+						</select>			
+						<?php else: ?> 
+						No Menus
+						<?php endif; ?> 
+					</div>
+				</div>
+				<table class="widefat fixed" cellspacing="0">
+					<thead>
+					<tr>
+						<th width="24%">Menu Item</th>
+						<th width="4%">Type</th>
+						<th width="30%">Links To</th>
+						<th width="7%">&nbsp;</th>
+						<th width="30%">Url</th>
+						<th width="5%">Status</th>
+					</tr>
+					</thead>
+					<tfoot>
+					<tr>
+						<th>Menu Item</th>
+						<th>Type</th>
+						<th>Links To</th>
+						<th>&nbsp;</th>
+						<th>Url</th>
+						<th>Status</th>
+					</tr>
+					</tfoot>
+					<tbody id="nav-menu-items" >
+		<?php 
+				
+					$menus = vsm_nav_menu($menus[0]->term_id);
+					$output = '';
+					menu_rows($output, $menus['children'], '', '');
+					echo($output);
+		?>			
+					</tbody>
+				</table>
+			</div>
+		</div>		
 	</div>
+	<?php
+	}
+	?>
 	<div id="pages-list-dialog" title="Change Menu Item Link: ">
 		<div class="postbox">
 			<label>Select a page that you would like this menu item to link to.</label>
@@ -784,6 +896,34 @@ function ajaxVsmNavmenus() {
 			menu_rows($output, $menus['children'], '', '');
 			$response['json_menu'] = $output;
 		break;
+		case 'delete-page':
+			wp_delete_post( $_REQUEST['post-id'] );
+			$pages = get_pages(); 
+			$output = '';
+			if (count($pages) > 0) {
+				foreach ($pages as $p) {
+					$menu = '';
+					$menu_items = wp_get_associated_nav_menu_items( $p->ID );
+					// $menuitem = get_menuitem($p->ID);
+					if (count($menu_items) > 0) {
+						get_menu_item_parents($menu, $menu_items[0]);
+					}	
+					$link = '';
+					get_parents($link, $p->ID);
+					$output .= '<tr>
+									<td>' . $link . '</td>
+									<td>' . $menu . '</td>
+									<td><a href="' . get_page_link($p->ID) . '">' . get_page_link($p->ID) . '</a></td>
+									<td>' . $p->post_status . '</td>
+									<td><input type="button" value="Delete" class="button-secondary" id="' . $p->ID . '" name=""></td>
+								</tr>';
+				}
+			} else {
+				$output = '<tr><td colspan="5">No Pages</td></tr>';
+			}
+			$response['json_page'] = $output;
+		break;
+		
 	}
 
 	// Get all nav menus
