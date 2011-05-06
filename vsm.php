@@ -335,6 +335,7 @@ function vsm_plugin_menu() {
 	add_action('admin_print_scripts-' . $page, 'vsm_plugin_admin_scripts');	
 	
 	$page = add_submenu_page( 'vsm', 'List View', 'List View', 'publish_pages', 'vsm-list-view', 'vsm_list_view' );
+	add_action('admin_print_styles-' . $page, 'vsm_plugin_admin_styles_list');
 	add_action('admin_print_scripts-' . $page, 'vsm_plugin_admin_scripts_list');	
 	
 }
@@ -354,8 +355,12 @@ global $is_IE;
 	wp_enqueue_script('vsm');	
 }
 
+function vsm_plugin_admin_styles_list() {
+	wp_enqueue_style('vsm-list', WP_PLUGIN_URL . '/vsm/css/jquery-ui.css');
+}
+
 function vsm_plugin_admin_scripts_list() {
-	wp_enqueue_script('vsm-list', WP_PLUGIN_URL . '/vsm/js/vsm-list.js', array('jquery'), '1.0');
+	wp_enqueue_script('vsm-list', WP_PLUGIN_URL . '/vsm/js/vsm-list.js', array('jquery', 'jquery-ui-core', 'jquery-ui-draggable', 'jquery-ui-resizable', 'jquery-ui-dialog'), '1.0');
 }
 
 function vsm_tree_view() {
@@ -382,7 +387,6 @@ function menu_rows(&$output, $menus, $level, $edit) {
 	static $rowclass;
 
 	foreach ($menus as $menu) {
-
 		if (isset($menu['name'])) {
 			$name = $menu['name'];
 			$type = '';
@@ -390,7 +394,7 @@ function menu_rows(&$output, $menus, $level, $edit) {
 			$status = '';
 			$object_id = null;
 			$link = '';
-			
+			$change = '';
 			if (is_object($menu['data'])) {
 				$data = $menu['data'];
 				
@@ -404,6 +408,7 @@ function menu_rows(&$output, $menus, $level, $edit) {
 					$object_id = $data->object_id;
 					if ($object_id != null) {
 						get_parents($link, $object_id);
+						$change = '<input type="button" value="Change" class="button-secondary" id="' . $menu['id'] . '|' . $object_id . '" name="">';
 					}
 				}
 			}
@@ -413,11 +418,12 @@ function menu_rows(&$output, $menus, $level, $edit) {
 			}
 			
 			$output .= '<tr class="'.$rowclass.'">
-							<td>' . $name . '</td>
-							<td>' . $type . '</td>
-							<td>' . $link . '</td>
-							<td>' . $url . '</td>
-							<td>' . $status . '</td>
+							<td>' . $name .  '</td>
+							<td>' . $type .  '</td>
+							<td>' . $link .  '</td>
+							<td>' . $change. '</td>
+							<td>' . $url .   '</td>
+							<td>' . $status .'</td>
 						</tr>';
 			if (is_array($menu['children'])) {
 				menu_rows($output, $menu['children'], $name, $link);
@@ -452,9 +458,10 @@ function vsm_list_view() {
 		<table class="widefat fixed" cellspacing="0">
 			<thead>
 			<tr>
-				<th width="30%">Menu Item</th>
-				<th width="5%">Type</th>
+				<th width="24%">Menu Item</th>
+				<th width="4%">Type</th>
 				<th width="30%">Links To</th>
+				<th width="7%">&nbsp;</th>
 				<th width="30%">Url</th>
 				<th width="5%">Status</th>
 			</tr>
@@ -464,6 +471,7 @@ function vsm_list_view() {
 				<th>Menu Item</th>
 				<th>Type</th>
 				<th>Links To</th>
+				<th>&nbsp;</th>
 				<th>Url</th>
 				<th>Status</th>
 			</tr>
@@ -479,6 +487,12 @@ function vsm_list_view() {
 			</tbody>
 		</table>	
 	</div>
+	<div id="pages-list-dialog" title="Change Menu Item Link: ">
+		<div class="postbox">
+			<label>Select a page that you would like this menu item to link to.</label>
+			<div class="inside" id="pages-list-dialog-content"></div>
+		</div>
+	</div>							
 <?php	
 }
 
@@ -727,6 +741,48 @@ function ajaxVsmNavmenus() {
 				menu_rows($output, $menus['children'], '', '');
 				$response['json_menu'] = $output;
 			}
+		break;
+		case 'get-pages-list':
+			if ( is_nav_menu( $nav_menu_selected_id ) ) {
+				$title = 'Change Menu Item Link: ';
+				$menu_items = wp_get_nav_menu_items( $nav_menu_selected_id );
+				foreach ($menu_items as $menu_item) {
+					if ($menu_item->ID == $_REQUEST['menu-item-id']) {
+						$title .= $menu_item->title;
+					}
+				}
+				$pages = wp_dropdown_pages(array('name' => 'pages-list', 'selected' => $_REQUEST['menu-item-object-id'], 'sort_column'=> 'menu_order', 'echo' => 0, 'show_option_none' => 'Select a page' ));
+				$response['menu_item_id'] = $_REQUEST['menu-item-id'];
+				$response['title'] = $title;
+				$response['pages'] = $pages;
+			}
+		break;
+		case 'update-menu-item-list':
+			if ( is_nav_menu( $nav_menu_selected_id ) ) {
+				$menu_items = wp_get_nav_menu_items( $nav_menu_selected_id );
+				foreach ($menu_items as $menu_item) {
+					if ($menu_item->ID == $_REQUEST['menu-item-id']) {
+						$args = array(
+							'menu-item-object-id' => $_REQUEST['menu-item-object-id'],
+							'menu-item-object' => $menu_item->object,		
+							'menu-item-parent-id' => $menu_item->menu_item_parent,		
+							'menu-item-type' => $menu_item->type,		
+							'menu-item-target' => $menu_item->target,
+							'menu-item-position' => $menu_item->menu_order,
+							'menu-item-url' => $menu_item->url,			
+							'menu-item-db-id' => $menu_item->db_id,			
+							'menu-item-title' => $menu_item->title
+						);
+						$menu_item_db_id = wp_update_nav_menu_item( $nav_menu_selected_id, $_REQUEST['menu-item-id'], $args );
+					}
+				
+				}
+				$response['json_test'] = $menu_items;
+			}
+			$menus = vsm_nav_menu($nav_menu_selected_id);
+			$output = '';
+			menu_rows($output, $menus['children'], '', '');
+			$response['json_menu'] = $output;
 		break;
 	}
 
