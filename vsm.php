@@ -370,6 +370,7 @@ function vsm_tree_view() {
 	vsm_nav_menus_show();
 }
 
+/*
 function get_menuitem($post_id) {
 	$menus = wp_get_nav_menus();
 	$menuitem = '';
@@ -383,6 +384,32 @@ function get_menuitem($post_id) {
 				}
 			}
 		}
+	}
+	return false;
+}
+*/
+
+function get_menuitem($menu_item_id) {
+	$menu_item = get_post( $menu_item_id );
+	if ($menu_item != null) {
+		$menu_item->menu_item_parent = get_post_meta( $menu_item->ID, '_menu_item_menu_item_parent', true );
+		$menu_item->object_id = get_post_meta( $menu_item->ID, '_menu_item_object_id', true );
+		$menu_item->object = get_post_meta( $menu_item->ID, '_menu_item_object', true );
+		$menu_item->type = get_post_meta( $menu_item->ID, '_menu_item_type', true );
+		$menu_item->url = get_post_meta( $menu_item->ID, '_menu_item_url', true );
+		$menu_item->target = get_post_meta( $menu_item->ID, '_menu_item_target', true );
+		$menu_item->classes = (array) get_post_meta( $menu_item->ID, '_menu_item_classes', true );
+		$menu_item->xfn = get_post_meta( $menu_item->ID, '_menu_item_xfn', true );
+		$menu_item->title = '';
+		if ($menu_item->post_title != '') {
+			$menu_item->title = $menu_item->post_title;		
+		} else {
+			$post = get_post( $menu_item->object_id );
+			if ($post != null ) {
+				$menu_item->title = $post->post_title;		
+			}
+		}
+		return $menu_item; 
 	}
 	return false;
 }
@@ -857,11 +884,9 @@ function ajaxVsmNavmenus() {
 		case 'get-pages-list':
 			if ( is_nav_menu( $nav_menu_selected_id ) ) {
 				$title = 'Change Menu Item Link: ';
-				$menu_items = wp_get_nav_menu_items( $nav_menu_selected_id );
-				foreach ($menu_items as $menu_item) {
-					if ($menu_item->ID == $_REQUEST['menu-item-id']) {
-						$title .= $menu_item->title;
-					}
+				$menu_item = get_menuitem($_REQUEST['menu-item-id']);
+				if ($menu_item) {
+					$title .= $menu_item->title;
 				}
 				$pages = wp_dropdown_pages(array('name' => 'pages-list', 'selected' => $_REQUEST['menu-item-object-id'], 'sort_column'=> 'menu_order', 'echo' => 0, 'show_option_none' => 'Select a page' ));
 				$response['menu_item_id'] = $_REQUEST['menu-item-id'];
@@ -886,6 +911,7 @@ function ajaxVsmNavmenus() {
 							'menu-item-title' => $menu_item->title
 						);
 						$menu_item_db_id = wp_update_nav_menu_item( $nav_menu_selected_id, $_REQUEST['menu-item-id'], $args );
+						break;
 					}
 				
 				}
@@ -904,7 +930,6 @@ function ajaxVsmNavmenus() {
 				foreach ($pages as $p) {
 					$menu = '';
 					$menu_items = wp_get_associated_nav_menu_items( $p->ID );
-					// $menuitem = get_menuitem($p->ID);
 					if (count($menu_items) > 0) {
 						get_menu_item_parents($menu, $menu_items[0]);
 					}	
