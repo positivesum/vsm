@@ -276,7 +276,7 @@ function showPageInfo(event, id){
 				document.getElementById('menu-item-edit').href = '/wp-admin/post.php?post='+ node.data.object_id +'&action=edit';
 				document.getElementById('menu-item-preview').href = decodeURIComponent(node.data.url);			
 			} else {
-				document.getElementById('span-add').style.display = 'none';												
+				// document.getElementById('span-add').style.display = 'none';												
 				document.getElementById('link-to-original').style.display = 'none';					
 				document.getElementById('menu-item-url').style.display = 'block';		
 				document.getElementById('edit-menu-item-url').value = decodeURIComponent(node.data.url);				
