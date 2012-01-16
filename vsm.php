@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Visual Site Menus  
-Plugin URI: http://www.homewood.hstd.org/
-Description: The goal of this plugin is to display the site menus of a large site using Jit Spacetree vizualization. 
-Version: 0.1
-Author: Alexander Yachmenev
-Author URI: http://www.odesk.com/users/~~94ca72c849152a57
+Plugin Name: Visual Site Manager
+Plugin URI: http://wordpress.org/extend/plugins/vsm/
+Description: Visual Site Manager makes it easier to manage page and menu structure of large websites.
+Version: 1.0
+Author: Taras Mankovski
+Author URI: http://taras.cc
 */
 
 /* 

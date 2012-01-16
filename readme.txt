@@ -1,10 +1,9 @@
-=== Visual Site Menus Plugin  (VSM) ===
-Contributors: homewood
-Donate link: http://homewood.com/
-Tags: sitemaps, jit
-Requires at least: 2.0.2
-Tested up to: 2.1
-Stable tag: 4.3
+=== Visual Site Manager (VSM) ===
+Contributors: tarasm
+Tags: sitemaps, jit, menus, visual
+Requires at least: 3.0
+Tested up to: 3.3.1
+Stable tag: 1.0
 
 The goal of this Visual Site Menus Plugin to display the site menus of a large site using Jit Spacetree vizualization: 
 - visual the page hierarchy as spacetree ability to add, update and delete pages via VSM interface;
