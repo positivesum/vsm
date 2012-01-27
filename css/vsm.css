@@ -736,8 +736,7 @@ gray - #CDCDCD
 silver - #8F8E8D
 */
 
-
-div.menu-item-settings {
+div.popup-settings {
 display:none;
 position:absolute;
 min-width:300px;
@@ -747,6 +746,28 @@ border-style:solid;
 border-width:1px;
 padding:10px;
 z-index:9999999;
+}
+
+/*
+#menu-item-settings {
+display:none;
+position:absolute;
+min-width:300px;
+background:none repeat scroll 0 0 #F9F9F9;
+border-color:#E6E6E6;
+border-style:solid;
+border-width:1px;
+padding:10px;
+z-index:9999999;
+}
+
+#menu-item-settings p.description {
+float: none !important;
+}
+*/
+
+div.popup-settings .menu-item-actions {
+    padding-top: 0 !important;
 }
 
 .link-to-original {
@@ -886,6 +907,7 @@ width:100%;
 
 #nav-menu-theme-locations  {
 	width:300px;
+	display: none;
 }
 
 #nav-menu-theme-locations div.panel  {

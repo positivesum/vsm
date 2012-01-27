@@ -18,12 +18,12 @@
 
 function showPage(id) {
 	if (id == 0) {
-		$('#menu-item-name-wrap').hide();	
-		$('#titlewrap').show();
-		$('#title').val('');		
+		jQuery('#menu-item-name-wrap').hide();	
+		jQuery('#titlewrap').show();
+		jQuery('#title').val('');		
 	} else {
-		$('#menu-item-name-wrap').show();	
-		$('#titlewrap').hide();	
+		jQuery('#menu-item-name-wrap').show();	
+		jQuery('#titlewrap').hide();	
 	}
 
 }
@@ -44,14 +44,13 @@ function init(jsonTree) {
     st.loadJSON(json);
     //compute node positions and layout
     st.compute();
-
+	
     setST();		
 
-	calcSize();
-	
-	var node_active_id = $.cookie("vsm_active_node_id");
+	var node_active_id = jQuery.cookie("vsm_active_node_id");
 	if (node_active_id) {
-	    var TUtil = TreeUtil;
+//	    var TUtil = TreeUtil;
+		var TUtil = $jit.json;
 		var node = TUtil.getSubtree(json, node_active_id);
 		if (node != null) {
 			st.onClick(node_active_id);				
@@ -63,17 +62,19 @@ function init(jsonTree) {
 	} else {
 		st.onClick(st.root);	
 	}
+	
+	calcSize();
 	scrollMap();										
 }
 
 //canvas height function
 function setCanvas(){
-    if($('#viewPort').size()>0) $('#viewPort').height($(window).height() - ($('#viewPort').get(0).scrollTop + 150));
+    if(jQuery('#viewPort').size()>0) jQuery('#viewPort').height(jQuery(window).height() - (jQuery('#viewPort').get(0).scrollTop + 150));
 } 
 
 function calcSize() {
 	var levels = 0;
-	var GUtil = Graph.Util;
+	var GUtil = $jit.Graph.Util;
 	GUtil.eachNode(st.graph, function(n) {  
 		if (levels <  n._depth) {
 			levels = n._depth;
@@ -118,12 +119,14 @@ function calcSize() {
 	if (canvasheight < objDiv.clientHeight) {
 		canvasheight = objDiv.clientHeight;
 	}	
-    st.canvas.resize(canvaswidth, canvasheight);		
+	
+    st.canvas.resize(parseInt(canvaswidth), parseInt(canvasheight));		
 }
 
 function setST(){
-    var maxtext = '';
-      var GUtil = Graph.Util;
+	var maxtext = '';
+//	var GUtil = Graph.Util;
+	var GUtil = $jit.Graph.Util;
       GUtil.eachNode(st.graph, function(n) {  
         if (maxtext.length <  n.name.length) {
             maxtext = n.name;
@@ -157,7 +160,7 @@ var view = {
     screen: 'normal',	
     map: function(){
         if (this.getState() == 'outline') {
-            $('#viewPort, #viewToggles ul').addClass('map').removeClass('outline');
+            jQuery('#viewPort, #viewToggles ul').addClass('map').removeClass('outline');
             this.state = 'map';
 			calcSize();			
             st.switchPosition('top', "animate", {
@@ -169,7 +172,7 @@ var view = {
     },
     outline: function(){
         if (this.getState() == 'map') {
-            $('#viewPort, #viewToggles ul').addClass('outline').removeClass('map');
+            jQuery('#viewPort, #viewToggles ul').addClass('outline').removeClass('map');
             this.state = 'outline';
 			calcSize();			
             st.switchPosition('left', "animate", {
@@ -183,18 +186,18 @@ var view = {
     fullscreen: function(){
         if (this.getScreen() == 'normal') {
             this.screen = 'full';
-        	$('#wphead').hide();			
-        	$('#adminmenu').hide();						
-        	$('#footer').hide();									
-        	$('body').css("overflow","hidden");
-		    $('#wrap').addClass('fullscreen');
+        	jQuery('#wphead').hide();			
+        	jQuery('#adminmenu').hide();						
+        	jQuery('#footer').hide();									
+        	jQuery('body').css("overflow","hidden");
+		    jQuery('#wrap').addClass('fullscreen');
         } else {
             this.screen = 'normal';				
-        	$('#wphead').show();					
-        	$('#adminmenu').show();					
-        	$('#footer').show();												
-        	$('body').css("overflow","auto");		
-		    $('#wrap').removeClass('fullscreen');					
+        	jQuery('#wphead').show();					
+        	jQuery('#adminmenu').show();					
+        	jQuery('#footer').show();												
+        	jQuery('body').css("overflow","auto");		
+		    jQuery('#wrap').removeClass('fullscreen');					
 		}
 		scrollMap();												
     },	
@@ -217,7 +220,7 @@ function scrollMap(){
 } 
 
 function showPageInfo(event, id){
-    var TUtil = TreeUtil;
+    var TUtil = $jit.json;
     var node = TUtil.getSubtree(json, id);
 	var patt=/menu/g;
 	if (node.id == '0') {
@@ -293,7 +296,7 @@ function showPageInfo(event, id){
 		}	
 	}
 
-    var tempPageMeta = $('#menu-item-settings').attr('parentID', node.id).positionInfo().fadeIn(400);
+    var tempPageMeta = jQuery('#menu-item-settings').attr('parentID', node.id).positionInfo().fadeIn(400);
 	
 	if (!event.cancelBubble) {
       event.cancelBubble = true;	
@@ -303,24 +306,24 @@ function showPageInfo(event, id){
 
 } 
 
-$.fn.positionInfo = function(){
-    var thisParent = $('#'+$(this).attr('parentID'));
+jQuery.fn.positionInfo = function(){
+    var thisParent = jQuery('#'+jQuery(this).attr('parentID'));
     var parentLoc = thisParent.offset();
-    $(this).css('top', parentLoc.top  + 50);
-    $(this).css('left', parentLoc.left - 50);
-    return $(this);
+    jQuery(this).css('top', parentLoc.top  + 50);
+    jQuery(this).css('left', parentLoc.left - 50);
+    return jQuery(this);
 }
 
 function locationsMenu(){
-	$('#menu-item-settings').fadeOut(400);
-    var tempPageMeta = $('#nav-menu-theme-locations').attr('parentID', 0).positionInfo().fadeIn(400);
+	jQuery('#menu-item-settings').fadeOut(400);
+    var tempPageMeta = jQuery('#nav-menu-theme-locations').attr('parentID', 0).positionInfo().fadeIn(400);
 }
 
 function saveMenuLocations(){
-	var locations = $('#nav-menu-theme-locations form').serialize();
+	var locations = jQuery('#nav-menu-theme-locations form').serialize();
   if (locations != '') {
-		$('#nav-menu-theme-locations').fadeOut(400);
-		$.ajax({
+		jQuery('#nav-menu-theme-locations').fadeOut(400);
+		jQuery.ajax({
 		   type: "POST",
 //		   url: "/wp-admin/admin-ajax.php",
 		   url: ajaxurl,
@@ -340,8 +343,8 @@ action=menu-locations-save&menu-settings-column-nonce=2c5703b410&menu-locations%
 function addMenu(){
 	var name = document.getElementById('edit-menu-item-title').value;
 	if (name != '') {
-		$('#menu-item-settings').fadeOut(400);
-		$.ajax({
+		jQuery('#menu-item-settings').fadeOut(400);
+		jQuery.ajax({
 		   type: "POST",
 //		    url: "/wp-admin/admin-ajax.php",
 			url: ajaxurl,
@@ -363,7 +366,7 @@ function addMenu(){
 									 for (var i in data.messages) {
 										str += data.messages[i];
 									 }
-									$("#messages").html(str);									
+									jQuery("#messages").html(str);									
 									
 							}
 				});
@@ -377,8 +380,8 @@ function addMenu(){
 function deleteMenu(id) {
 	var r=confirm("You are about to permanently delete this menu.\n 'Cancel' to stop, 'OK' to delete.");
 	if (r==true) {
-		$('#menu-item-settings').fadeOut(400);
-		$.ajax({
+		jQuery('#menu-item-settings').fadeOut(400);
+		jQuery.ajax({
 		   type: "POST",
 //		    url: "/wp-admin/admin-ajax.php",
 			url: ajaxurl,
@@ -391,14 +394,14 @@ function deleteMenu(id) {
 			st.removeSubtree(menu_id, true, 'replot', {
 						hideLabels: false,
 						onAfterCompute: function() {
-							$.cookie("vsm_active_node_id", st.root ); //		  																
+							jQuery.cookie("vsm_active_node_id", st.root ); //		  																
 							st.onClick(st.root);
 							scrollMap();					
 							 var str = '';	
 							 for (var i in data.messages) {
 								str += data.messages[i];
 							 }
-							$("#messages").html(str);							
+							jQuery("#messages").html(str);							
 						}
 			});
 		
@@ -410,8 +413,8 @@ function deleteMenu(id) {
 function saveMenu(id){
 	var name = document.getElementById('edit-menu-item-title').value;
 	if (name != '') {
-		$('#menu-item-settings').fadeOut(400);
-		$.ajax({
+		jQuery('#menu-item-settings').fadeOut(400);
+		jQuery.ajax({
 		   type: "POST",
 //		    url: "/wp-admin/admin-ajax.php",
 			url: ajaxurl,
@@ -425,12 +428,13 @@ function saveMenu(id){
 			 for (var i in data.messages) {
 				str += data.messages[i];
 			 }
-			$("#messages").html(str);
-			var TUtil = TreeUtil;
+			jQuery("#messages").html(str);
+//			var TUtil = TreeUtil;
+			var TUtil = $jit.json;
 			var node = TUtil.getSubtree(json, 'menu-'+id);			
 			node.name = name;	
 			node.data.name = name;							
-			$('#menu-'+id).html('<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a>');
+			jQuery('#menu-'+id).html('<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a>');
 		   }
 		 });			
 	} else {
@@ -454,8 +458,8 @@ function getSubtree(subtree) {
 }
 
 function deleteMenuItem(menu, id){
-
-	var subtree = TreeUtil.getSubtree(json, id);
+	var TUtil = $jit.json;
+	var subtree = TUtil.getSubtree(json, id);
 	var ids = [id];
 	if (subtree != null) {
 		ids = getSubtree(subtree);
@@ -463,8 +467,8 @@ function deleteMenuItem(menu, id){
 	
 	var r=confirm("You are about to permanently delete this menu item.\n 'Cancel' to stop, 'OK' to delete.");
 	if (r==true) {
-		$('#menu-item-settings').fadeOut(400);
-		$.ajax({
+		jQuery('#menu-item-settings').fadeOut(400);
+		jQuery.ajax({
 		   type: "POST",
 //		    url: "/wp-admin/admin-ajax.php",
 			url: ajaxurl,
@@ -479,10 +483,11 @@ function deleteMenuItem(menu, id){
 			st.removeSubtree(id, true, 'animate', {
 				hideLabels: false,
 				onAfterCompute: function() {
-					var TUtil = TreeUtil;
+//					var TUtil = TreeUtil;
+					var TUtil = $jit.json;
 					var node = TUtil.getParent(json, id);									
 					st.onClick(node.id);																			
-					$.cookie("vsm_active_node_id", node.id ); //		  												   				
+					jQuery.cookie("vsm_active_node_id", node.id ); //		  												   				
 					/*
 					st.onClick(node.id);														
 					scrollMap();														
@@ -504,12 +509,13 @@ function addMenuItem(id){
 	document.getElementById('submenu-item-add').onclick = function(){
 		addSubMenuItem(id);
 	};		
-	$('#menu-item-settings').fadeOut(400);
-    var tempPageMeta = $('#typediv').attr('parentID', id).positionInfo().fadeIn(400);
+	jQuery('#menu-item-settings').fadeOut(400);
+    var tempPageMeta = jQuery('#typediv').attr('parentID', id).positionInfo().fadeIn(400);
 }
 
 function addSubMenuItem(id){
-	var TUtil = TreeUtil;
+//	var TUtil = TreeUtil;
+    var TUtil = $jit.json;
 	var node = TUtil.getSubtree(json, id);
 	var menu = 0;
 	var parent_id = 0;
@@ -529,7 +535,7 @@ function addSubMenuItem(id){
 	switch(tab) {
 	case 'pages':
 		object_type	 = 'page';
-		var page = $('input:radio[name=page]:checked').val();
+		var page = jQuery('input:radio[name=page]:checked').val();
 		if (page == 'new_page') {
 			name = document.getElementById('title').value;				
 			if (name == '') {
@@ -578,7 +584,7 @@ function addSubMenuItem(id){
 	  break;	  
 	}	
 
-	$('#typediv').fadeOut(400);	
+	jQuery('#typediv').fadeOut(400);	
 
 	if (tab == 'links') {
 		var post = 'operation=add-menu-item&menu='
@@ -600,7 +606,7 @@ function addSubMenuItem(id){
 	}
 	
 	
-	$.ajax({
+	jQuery.ajax({
 	   type: "POST",
 //	    url: "/wp-admin/admin-ajax.php",
 	    url: ajaxurl,
@@ -627,7 +633,7 @@ function addSubMenuItem(id){
 								 for (var i in data.messages) {
 									str += data.messages[i];
 								 }
-								$("#messages").html(str);								
+								jQuery("#messages").html(str);								
 								if (tab == 'links') {
 								  document.getElementById('edit-menu-item-url').value = url;	
 								}
@@ -642,14 +648,15 @@ function addSubMenuItem(id){
 
 function selectTab(id) {
 	tab = id;
-	$('#add-menu-item-tabs li').removeClass('tabs');
-	$('#tab-'+id).addClass('tabs');	
-	$('.tabs-panel').removeClass('tabs-panel-active').addClass('tabs-panel-inactive');
-	$('#tabs-panel-'+id).removeClass('tabs-panel-inactive').addClass('tabs-panel-active');
+	jQuery('#add-menu-item-tabs li').removeClass('tabs');
+	jQuery('#tab-'+id).addClass('tabs');	
+	jQuery('.tabs-panel').removeClass('tabs-panel-active').addClass('tabs-panel-inactive');
+	jQuery('#tabs-panel-'+id).removeClass('tabs-panel-inactive').addClass('tabs-panel-active');
 }
 
 function saveMenuItem(id){
-	var TUtil = TreeUtil;
+//	var TUtil = TreeUtil;
+    var TUtil = $jit.json;
 	var node = TUtil.getSubtree(json, id);
 	
 	var name = document.getElementById('edit-menu-item-title').value;
@@ -674,9 +681,9 @@ function saveMenuItem(id){
 		url	= '#';
 	}
 	*/
-	$('#menu-item-settings').fadeOut(400);
+	jQuery('#menu-item-settings').fadeOut(400);
 	
-	$.ajax({
+	jQuery.ajax({
 	   type: "POST",
 //	    url: "/wp-admin/admin-ajax.php",
 	    url: ajaxurl,
@@ -709,7 +716,7 @@ function saveMenuItem(id){
 */
        dataType: 'json',
 	   success: function(data){
-			$('#'+id).html('<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + id + '\')">'+name+'</a>');
+			jQuery('#'+id).html('<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + id + '\')">'+name+'</a>');
 		node.name = name;	
 		node.data.title = name;				
 		node.data.url = url;		
@@ -718,7 +725,7 @@ function saveMenuItem(id){
 		 for (var i in data.messages) {
 			str += data.messages[i];
 		 }
-		$("#messages").html(str);
+		jQuery("#messages").html(str);
 	   }
 	 });	
 }
@@ -726,60 +733,54 @@ function saveMenuItem(id){
 /*-------------------------------------------------------------------------
 DOM READY EVENTS
 -------------------------------------------------------------------------*/
-$(function(){
+jQuery(function(){
     /*----------------------------------
     BUTTON BAR
     ----------------------------------*/
     //TOGGLE MAP VIEW
-    $('#mapView').click(function(){
+    jQuery('#mapView').click(function(){
         view.map();
         return false;
     });
 
     //TOGGLE OUTLINE VIEW
-    $('#outlineView').click(function(){
+    jQuery('#outlineView').click(function(){
         view.outline();
         return false;
     });
 
     //TOGGLE FULLSCREEN VIEW
-    $('#fullscreenView').click(function(){
+    jQuery('#fullscreenView').click(function(){
         view.fullscreen();
         return false;
     });	
 
     //HIDE TITLE PROMPT TEXT
-	$("#title").focus(function(){
-	  $('#title-prompt-text').hide();
-	  $(this).css({"background" : "none repeat scroll 0 0 #FFE8B6", "border-color": "#666666"});	  
+	jQuery("#title").focus(function(){
+	  jQuery('#title-prompt-text').hide();
+	  jQuery(this).css({"background" : "none repeat scroll 0 0 #FFE8B6", "border-color": "#666666"});	  
 	});
 
     //SHOW TITLE PROMPT TEXT
-	$("#title").focusout(function(){
-	  if ($(this).val() == '') {
-		$('#title-prompt-text').show();	  
+	jQuery("#title").focusout(function(){
+	  if (jQuery(this).val() == '') {
+		jQuery('#title-prompt-text').show();	  
 	  }	
-	  $(this).css({"background" : "none repeat scroll 0 0 #FFFFFF", "border-color": "#DFDFDF"});	  	  
+	  jQuery(this).css({"background" : "none repeat scroll 0 0 #FFFFFF", "border-color": "#DFDFDF"});	  	  
 	});	
 	
     setCanvas();
-    $(window).resize(function () {setCanvas();}); 
+    jQuery(window).resize(function () {setCanvas();}); 
 
     var viewPort = document.getElementById('viewPort');
 
-	var canvas = new Canvas('mycanvas', {
-	 //Where to inject canvas. Any HTML container will do.
-	 'injectInto':'viewPort',
-	 //Set a background color in case the browser
-	 //does not support clearing a specific area.
-	'backgroundColor': backgroundColor
-	});
-
     //Create a new ST instance
-    st= new ST(canvas, {
+    st= new $jit.ST({
+		injectInto:'viewPort',	
         orientation: "top",
 		levelsToShow: 1,		
         withLabels: true, 
+		backgroundColor: backgroundColor,		
         //change the animation/transition effect		
    //     transition: Trans.Quart.easeOut,		
       //set node and edge colors
@@ -794,7 +795,12 @@ $(function(){
 		  type: 'bezier',
 		  overridable: true
 		},
-		
+/*		
+        Navigation: {
+          enable:true,
+          panning:true
+        },
+*/		
 		//This method is called on DOM label creation.
 		//Use this method to add event handlers and styles to
 		//your node.
@@ -806,8 +812,8 @@ $(function(){
 				label.innerHTML = '<b>'+node.name+'</b>';						
 			}
 		  label.onclick = function(){
-			var node_active_id = $.cookie("vsm_active_node_id");
-			$.cookie("vsm_active_node_id", node.id );		  			
+			var node_active_id = jQuery.cookie("vsm_active_node_id");
+			jQuery.cookie("vsm_active_node_id", node.id );		  			
 			st.onClick(node.id);
             scrollMap();
 		  };
@@ -822,7 +828,6 @@ $(function(){
 		  style.textAlign= 'center';
 		  style.paddingTop = '1px';
 		},
-		
 		//This method is called right before plotting
 		//a node. It's useful for changing an individual node
 		//style properties before plotting it.
@@ -836,12 +841,11 @@ $(function(){
 		  }
 		  else {
 			delete node.data.$color;
-			var GUtil = Graph.Util;
 			//if the node belongs to the last plotted level
-			if(!GUtil.anySubnode(node, "exist")) {
+			if(!node.anySubnode("exist")) {
 			  //count children number
 			  var count = 0;
-			  GUtil.eachSubnode(node, function(n) { count++; });
+			  node.eachSubnode(function(n) { count++; });
 			  //assign a node color based on
 			  //how many children it has
 			  if (count > 1) {
@@ -851,7 +855,7 @@ $(function(){
 			}
 		  }
 		},
-
+		
 		//This method is called right before plotting
 		//an edge. It's useful for changing an individual edge
 		//style properties before plotting it.
@@ -867,10 +871,9 @@ $(function(){
 			delete adj.data.$lineWidth;
 		  }
 		}
-
     });
 
-	$.ajax({
+	jQuery.ajax({
 	    type: "POST",
 //	    url: "/wp-admin/admin-ajax.php",
 	    url: ajaxurl,
@@ -883,7 +886,7 @@ $(function(){
 		 for (var i in data.messages) {
 			str += data.messages[i];
 		 }
-		$("#messages").html(str);
+		jQuery("#messages").html(str);
 		recently_edited = data.recently_edited;
 		init(data.json_menus);
 	   }

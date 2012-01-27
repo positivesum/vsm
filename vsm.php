@@ -83,8 +83,6 @@ function vsm_nav_menus() {
 	}
 	$json_menus['count'] = $count;
 	
-	
-	
 	$menus = array (
 		'id' => -1,
 		'name' => getDomain(site_url()),
@@ -120,11 +118,11 @@ function vsm_nav_menu($term_id) {
 function vsm_nav_menu_locations_box() {
 	if ( ! current_theme_supports( 'menus' ) ) {
 		// We must only support widgets. Leave a message and bail.
-		echo '<div id="nav-menu-theme-locations" class="menu-item-settings">
+		echo '<div id="nav-menu-theme-locations" class="popup-settings">
 				<h3 class="hndle"><span>Theme Locations</span></h3>
 					<p class="howto">' . __('The current theme does not natively support menus, but you can use the &#8220;Custom Menu&#8221; widget to add any menus you create here to the theme&#8217;s sidebar.') . '</p>
-	<div class="menu-item-actions description-wide submitbox">
-		<a class="submitcancel" href="javascript:void(0)" onclick="$(\'#nav-menu-theme-locations\').fadeOut(400);">Cancel</a><div></div>';
+	<div class="menu-item-actions submitbox">
+		<a class="submitcancel" href="javascript:void(0)" onclick="jQuery(\'#nav-menu-theme-locations\').fadeOut(400);">Cancel</a><div></div>';
 		return;
 	}
 
@@ -133,7 +131,7 @@ function vsm_nav_menu_locations_box() {
 	$menu_locations = get_nav_menu_locations();
 	$num_locations = count( array_keys($locations) );
 
-	echo '<div id="nav-menu-theme-locations" class="menu-item-settings">
+	echo '<div id="nav-menu-theme-locations" class="popup-settings">
 				<h3 class="hndle"><span>Theme Locations</span></h3>
 				<p class="howto">' . sprintf( _n('Your theme supports %s menu. Select which menu you would like to use.', 'Your theme supports %s menus. Select which menu appears in each location.', $num_locations ), number_format_i18n($num_locations) ) . '</p><form><div class="panel"><input type="hidden" name="action" value="menu-locations-save" />';
 	wp_nonce_field( 'add-menu_item', 'menu-settings-column-nonce' );				
@@ -159,10 +157,10 @@ function vsm_nav_menu_locations_box() {
 	?>
 	</div>		
 	</form>
-	<div class="menu-item-actions description-wide submitbox">
+	<div class="menu-item-actions submitbox">
 		<a class="submitcancel" href="javascript:void(0)" onclick="saveMenuLocations();" >Save</a>
 		<span class="meta-sep"> | </span> 		
-		<a class="submitcancel" href="javascript:void(0)" onclick="$('#nav-menu-theme-locations').fadeOut(400);">Cancel</a>
+		<a class="submitcancel" href="javascript:void(0)" onclick="jQuery('#nav-menu-theme-locations').fadeOut(400);">Cancel</a>
 	</div>	
 	</div>		
 	<?php
@@ -185,14 +183,20 @@ function vsm_nav_menus_show() {
             <li id="outlineView"><a href="javascript:void(0)" title="Outline View">Outline View</a></li>
             <li id="fullscreenView"><a href="javascript:void(0)" title="Full Screen View">Full Screen View</a></li>        </ul>
         </div>
-        <div id="viewPort" class="outline"></div>
+        <div id="viewPort" class="outline" ></div>
     </div>
 </div>
 </div>
 
+<style>
+#viewPort {
+    height: 600px;
+}
+</style>
+
 <?php vsm_nav_menu_locations_box(); ?>
 
-<div id="menu-item-settings" class="menu-item-settings" >
+<div id="menu-item-settings" class="popup-settings" >
 	<p class="description description-thin">
 		<label for="edit-menu-item-title">
 			Navigation Label<br>
@@ -205,7 +209,7 @@ function vsm_nav_menus_show() {
 		</label>
 	</p>	
 	<div class="link-to-original" id="link-to-original">Original:
-		<div style="float:right;" class="menu-item-actions description-wide submitbox">
+		<div style="float:right;" class="menu-item-actions submitbox">
 			<a href="#" id="menu-item-edit" class="submitcancel">Edit</a><span class="meta-sep"> | </span> 		
 			<a href="#" id="menu-item-preview" class="submitcancel">Preview</a>
 		</div>
@@ -219,23 +223,23 @@ function vsm_nav_menus_show() {
 			</select>
 		</label>
 	</p>			
-	<div class="menu-item-actions description-wide submitbox">
+	<div class="menu-item-actions submitbox">
 		<a href="javascript:void(0)" id="menu-item-locations" class="submitcancel">Locations</a><span id="span-locations" class="meta-sep"> | </span> 		
 		<span id="span-add"><a href="javascript:void(0)" id="menu-item-add" class="submitcancel">Add</a><span class="meta-sep"> | </span></span> 		
 		<span id="span-save"><a href="javascript:void(0)" id="menu-item-save" class="submitcancel" >Save</a><span class="meta-sep"> | </span></span>		
-		<a class="submitcancel" href="javascript:void(0)" onclick="$('#menu-item-settings').fadeOut(400);">Cancel</a>
+		<a class="submitcancel" href="javascript:void(0)" onclick="jQuery('#menu-item-settings').fadeOut(400);">Cancel</a>
 		<span id="span-delete" style="float:right"><a href="javascript:void(0)" id="menu-item-delete" class="submitdelete">Remove</a></span>		
 	</div>
 </div><!-- .menu-item-settings-->
 
-<div class="menu-item-settings" id="typediv">
+<div class="popup-settings" id="typediv">
 		<ul class="add-menu-item-tabs" id="add-menu-item-tabs">
 			<li class="tabs" id="tab-pages"><a href="javascript:void(0)" onclick="selectTab('pages');" class="nav-tab-link">Pages</a></li>		
 			 <?php if ( !get_option('hide_link_tab') ) {	?>		
-			<li class="" id="tab-links"><a href="javascript:void(0)" onclick="selectTab('links');" class="nav-tab-link">Links</a></li>
+			<li class="popup-settings" id="tab-links"><a href="javascript:void(0)" onclick="selectTab('links');" class="nav-tab-link">Links</a></li>
 			 <?php  }	?>					
 			 <?php if ( !get_option('hide_post_tab') ) {	?>					 
-			<li class="" id="tab-posts"><a href="javascript:void(0)" onclick="selectTab('posts');" class="nav-tab-link">Posts</a></li>
+			<li class="popup-settings" id="tab-posts"><a href="javascript:void(0)" onclick="selectTab('posts');" class="nav-tab-link">Posts</a></li>
 			 <?php  }	?>								
 		</ul>
 		<div id="tabs-panel-pages" class="tabs-panel tabs-panel-active">
@@ -302,9 +306,9 @@ function vsm_nav_menus_show() {
 			<?php endif; ?> 
 			
 		</div>
-	<div class="menu-item-actions description-wide submitbox" style="padding-top:6px;">
+	<div class="menu-item-actions submitbox" style="padding-top:6px;">
 		<a href="javascript:void(0)" id="submenu-item-add" class="submitcancel" onclick="">Add</a><span class="meta-sep"> | </span> 		
-		<a class="submitcancel" href="javascript:void(0)" onclick="$('#typediv').fadeOut(400);">Cancel</a>
+		<a class="submitcancel" href="javascript:void(0)" onclick="jQuery('#typediv').fadeOut(400);">Cancel</a>
 	</div>		
 </div>
 
@@ -315,11 +319,6 @@ function vsm_nav_menus_show() {
 function vsm_plugin_admin_init()  {
 	wp_register_style('vsmPluginStylesheet', WP_PLUGIN_URL . '/vsm/css/vsm.css');
 	/* Register scripts. */
-	wp_register_script('jquery142', WP_PLUGIN_URL . '/vsm/js/jquery-1.4.2.js');
-	wp_register_script('jquery-cookie', WP_PLUGIN_URL . '/vsm/js/jquery.cookie.js');	
-	wp_register_script('jit', WP_PLUGIN_URL . '/vsm/js/jit-1.1.3/jit.js');	
-	wp_register_script('excanvas', WP_PLUGIN_URL . '/vsm/js/jit-1.1.3//Extras/excanvas.js');		
-	wp_register_script('vsm', WP_PLUGIN_URL . '/vsm/js/vsm.js');		
 }
 
 function vsm_plugin_menu() {
@@ -349,10 +348,9 @@ global $is_IE;
 	if ($is_IE) {
 		wp_enqueue_script('excanvas');	
 	}
-	wp_enqueue_script('jquery142');
-	wp_enqueue_script('jquery-cookie');	
-	wp_enqueue_script('jit');	
-	wp_enqueue_script('vsm');	
+	wp_enqueue_script('jquery-cookie', WP_PLUGIN_URL . '/vsm/js/jquery.cookie.js', array('jquery'), '1.0');	
+	wp_enqueue_script('jit', WP_PLUGIN_URL . '/vsm/js/jit/jit.js', array('jquery'), '1.0');	
+	wp_enqueue_script('vsm', WP_PLUGIN_URL . '/vsm/js/vsm.js', array('jquery', 'jit'), '1.0');		
 }
 
 function vsm_plugin_admin_styles_list() {
@@ -720,6 +718,8 @@ function do_nothing_onclick($item_output) {
 }
 
 function ajaxVsmNavmenus() {
+		global $current_user;
+		
       // Load all the nav menu interface functions
       require_once(ABSPATH . 'wp-admin/includes/nav-menu.php');
 
