@@ -224,6 +224,9 @@ function showPageInfo(event, id){
     var node = TUtil.getSubtree(json, id);
 	var patt=/menu/g;
 	if (node.id == '0') {
+        jQuery('#menu-item-settings').css('min-width', '200px');
+        jQuery('#menu-item-settings').css('max-width', '200px');
+        
 		document.getElementById('edit-menu-item-title').value = '';		
 		document.getElementById('menu-item-locations').style.display = 'inline';			
 		document.getElementById('span-locations').style.display = 'inline';						
@@ -240,6 +243,8 @@ function showPageInfo(event, id){
 		};		
 		
 	} else {
+        jQuery('#menu-item-settings').css('min-width', '300px');
+        jQuery('#menu-item-settings').css('max-width', '300px');        
 		document.getElementById('menu-item-locations').style.display = 'none';					
 		document.getElementById('span-locations').style.display = 'none';		
 		document.getElementById('link-to-original').style.display = 'none';		
@@ -807,7 +812,7 @@ jQuery(function(){
 		onCreateLabel: function(label, node){
 			label.id = node.id;		
 			if (node.id != -1)  {
-				label.innerHTML = '<a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a>';			
+				label.innerHTML = '<b><a href="javascript:void(0)" onclick="showPageInfo(event, \'' + node.id + '\')">'+node.name+'</a><b>';			
 			} else {
 				label.innerHTML = '<b>'+node.name+'</b>';						
 			}
@@ -827,6 +832,8 @@ jQuery(function(){
 		  style.lineHeight = '1em';		  
 		  style.textAlign= 'center';
 		  style.paddingTop = '1px';
+		  style.background = node.data.$color; // IE empty div fix
+		  
 		},
 		//This method is called right before plotting
 		//a node. It's useful for changing an individual node
@@ -851,9 +858,10 @@ jQuery(function(){
 			  if (count > 1) {
                 count = 1;
               }
-              node.data.$color = [childrenColor0, childrenColor1][count];                    
+              node.data.$color = [childrenColor0, childrenColor1][count];
 			}
 		  }
+		  jQuery('#'+node.id).css('background', node.data.$color); // IE empty div fix
 		},
 		
 		//This method is called right before plotting

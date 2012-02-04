@@ -346,7 +346,7 @@ function vsm_plugin_admin_styles() {
 function vsm_plugin_admin_scripts() {
 global $is_IE;
 	if ($is_IE) {
-		wp_enqueue_script('excanvas');	
+		wp_enqueue_script('excanvas', WP_PLUGIN_URL . '/vsm/js/jit/Extras/excanvas.js');	
 	}
 	wp_enqueue_script('jquery-cookie', WP_PLUGIN_URL . '/vsm/js/jquery.cookie.js', array('jquery'), '1.0');	
 	wp_enqueue_script('jit', WP_PLUGIN_URL . '/vsm/js/jit/jit.js', array('jquery'), '1.0');	
