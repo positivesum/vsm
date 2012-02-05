@@ -183,19 +183,24 @@ var view = {
         }
 
     },
+	
     fullscreen: function(){
         if (this.getScreen() == 'normal') {
             this.screen = 'full';
-        	jQuery('#wphead').hide();			
+        	jQuery('#wphead').hide();
+        	jQuery('#adminmenuback').hide();						
         	jQuery('#adminmenu').hide();						
-        	jQuery('#footer').hide();									
+        	jQuery('#footer').hide();
+        	jQuery('#wpcontent').css("margin-left", "0");									
         	jQuery('body').css("overflow","hidden");
 		    jQuery('#wrap').addClass('fullscreen');
         } else {
             this.screen = 'normal';				
-        	jQuery('#wphead').show();					
+        	jQuery('#wphead').show();
+        	jQuery('#adminmenuback').show();						
         	jQuery('#adminmenu').show();					
-        	jQuery('#footer').show();												
+        	jQuery('#footer').show();
+        	jQuery('#wpcontent').css("margin-left", "165px");									
         	jQuery('body').css("overflow","auto");		
 		    jQuery('#wrap').removeClass('fullscreen');					
 		}
